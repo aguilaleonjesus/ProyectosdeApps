@@ -17,6 +17,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -40,11 +44,23 @@ fun range(start: LocalDate): String {
     return if (start.month == end.month && start.year == end.year) "${start.dayOfMonth}–${shortDate(end)}" else "${shortDate(start)} – ${shortDate(end)}"
 }
 
+/** Fit numerical totals to their column without dropping digits at large font sizes. */
+@Composable
+fun AdaptiveNumber(value: String, style: TextStyle, centered: Boolean = false) {
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val measurer = rememberTextMeasurer()
+        val width = measurer.measure(value, style).size.width.coerceAtLeast(1)
+        val available = with(LocalDensity.current) { maxWidth.toPx() }
+        val fitted = style.copy(fontSize = style.fontSize * (available / width).coerceAtMost(1f))
+        Text(value, Modifier.fillMaxWidth(), style = fitted, maxLines = 1, softWrap = false, textAlign = if (centered) TextAlign.Center else TextAlign.Start)
+    }
+}
+
 @Composable
 fun Summary(label: String, value: String, modifier: Modifier = Modifier) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(label, color = Muted, style = MaterialTheme.typography.labelLarge)
-        Text(value, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Medium)
+        AdaptiveNumber(value, MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Medium))
     }
 }
 
@@ -151,7 +167,7 @@ fun WeekScreen(now: LocalDateTime, date: LocalDate, repository: StepRepository, 
         item { PeriodNavigation(range(start), start > weekStart(StepSimulationEngine.HISTORY_START), start.plusDays(6) < today, { onDate(date.minusWeeks(1).coerceAtLeast(StepSimulationEngine.HISTORY_START)) }, { onDate(date.plusWeeks(1).coerceAtMost(today)) }, onCalendar) }
         item {
             Column(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 32.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(number(total), style = MaterialTheme.typography.displayMedium, fontWeight = FontWeight.Normal, letterSpacing = (-1).sp)
+                AdaptiveNumber(number(total), MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Normal, letterSpacing = (-1).sp), centered = true)
                 Text("pasos", color = Muted, style = MaterialTheme.typography.bodyLarge)
             }
         }
@@ -183,7 +199,7 @@ fun MonthScreen(now: LocalDateTime, date: LocalDate, repository: StepRepository,
         item { PeriodNavigation(monthTitle(date), start > StepSimulationEngine.HISTORY_START.withDayOfMonth(1), date.withDayOfMonth(date.lengthOfMonth()) < today, { onDate(date.minusMonths(1).coerceAtLeast(StepSimulationEngine.HISTORY_START)) }, { onDate(date.plusMonths(1).coerceAtMost(today)) }, onCalendar) }
         item {
             Column(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(number(total), style = MaterialTheme.typography.displayMedium, letterSpacing = (-1).sp)
+                AdaptiveNumber(number(total), MaterialTheme.typography.displayMedium.copy(letterSpacing = (-1).sp), centered = true)
                 Text("pasos este mes", color = Muted)
             }
         }

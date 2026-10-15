@@ -25,8 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
@@ -151,7 +153,7 @@ fun RitmoApp(vm: MainViewModel = viewModel()) {
             if (!debug && !history) {
                 TabRow(selectedTabIndex = tab, containerColor = Background, contentColor = Blue, divider = { HorizontalDivider(color = DividerColor, thickness = .5.dp) }) {
                     listOf("Día", "Semana", "Mes").forEachIndexed { index, label ->
-                        Tab(selected = tab == index, onClick = { tab = index; returnTab = -1 }, selectedContentColor = Blue, unselectedContentColor = Muted, text = { Text(label, style = MaterialTheme.typography.titleSmall) })
+                        Tab(selected = tab == index, onClick = { tab = index; returnTab = -1 }, selectedContentColor = Blue, unselectedContentColor = Muted, text = { Text(label, style = MaterialTheme.typography.titleSmall, fontSize = (14f / (LocalDensity.current.fontScale / 1.4f).coerceAtLeast(1f)).sp, maxLines = 1, softWrap = false) })
                     }
                 }
             }
