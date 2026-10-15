@@ -123,7 +123,7 @@ fun StepBarChart(
             }
             if (compact) {
                 // Sparse labels get their own width instead of being clipped to a narrow daily bar.
-                BoxWithConstraints(Modifier.fillMaxWidth().padding(top = 8.dp).height(26.dp)) {
+                BoxWithConstraints(Modifier.fillMaxWidth().padding(top = 8.dp).height(26.dp * LocalDensity.current.fontScale.coerceAtLeast(1f))) {
                     days.forEachIndexed { index, _ ->
                         val label = labels.getOrElse(index) { "" }
                         if (label.isNotEmpty()) {
