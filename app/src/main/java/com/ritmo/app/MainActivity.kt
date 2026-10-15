@@ -45,6 +45,8 @@ val DividerColor = Color(0xFF3C4043)
 
 class MainActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: android.content.Context) {
+        // Native date/time widgets also consult the process locale for their labels.
+        java.util.Locale.setDefault(Spanish)
         val config = android.content.res.Configuration(newBase.resources.configuration)
         config.setLocale(Spanish)
         super.attachBaseContext(newBase.createConfigurationContext(config))
